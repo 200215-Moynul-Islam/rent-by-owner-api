@@ -1,0 +1,21 @@
+# Binary
+rent-by-owner-api
+*.exe
+
+# Configuration
+conf/app.conf
+
+# IDE
+.vscode/
+
+# Sonar
+.scannerwork/
+
+# Test
+coverage.out
+
+# Logs
+*.log
+
+# Personal
+moynul/
