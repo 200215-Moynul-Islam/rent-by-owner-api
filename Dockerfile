@@ -9,6 +9,8 @@ RUN go mod download
 COPY . .
 
 RUN go build -o rent-by-owner-api .
+RUN go build -o import-destinations ./cmd/import-destinations
+
 
 # Runtime stage
 FROM alpine:3.22
@@ -19,6 +21,7 @@ RUN addgroup -S appgroup && \
 WORKDIR /app
 
 COPY --from=builder --chown=appuser:appgroup /app/rent-by-owner-api .
+COPY --from=builder --chown=appuser:appgroup /app/import-destinations .
 COPY --from=builder --chown=appuser:appgroup /app/conf ./conf
 
 USER appuser

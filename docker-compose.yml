@@ -10,6 +10,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./data:/app/data
 
   postgres:
     image: postgis/postgis:17-3.5
