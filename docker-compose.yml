@@ -29,5 +29,18 @@ services:
       timeout: 5s
       retries: 5
 
+  migrate:
+    image: migrate/migrate:latest
+    container_name: rent-by-owner-migrate
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://postgres:postgres@postgres:5432/rent_by_owner?sslmode=disable"
+      - "up"
+
 volumes:
   postgres_data:
