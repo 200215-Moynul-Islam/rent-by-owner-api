@@ -10,12 +10,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: rent_by_owner
-      DB_USER: postgres
-      DB_PASSWORD: postgres
 
   postgres:
     image: postgis/postgis:17-3.5

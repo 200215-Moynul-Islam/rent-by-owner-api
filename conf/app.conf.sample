@@ -4,4 +4,11 @@ runmode = dev
 autorender = false
 copyrequestbody = true
 EnableDocs = true
-sqlconn = 
+
+[database]
+host = postgres
+port = 5432
+name = rent_by_owner
+user = postgres
+password = change-me
+sslmode = disable
