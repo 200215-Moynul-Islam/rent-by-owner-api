@@ -175,16 +175,13 @@ func (r *destinationRepository) WithinBounds(
 			ST_Y(location::geometry) AS latitude,
 			ST_X(location::geometry) AS longitude
 		FROM destinations
-		WHERE ST_Within(
-			location::geometry,
-			ST_MakeEnvelope(
-				?,
-				?,
-				?,
-				?,
-				4326
-			)
-		)
+		WHERE location && ST_MakeEnvelope(
+			?,
+			?,
+			?,
+			?,
+			4326
+		)::geography
 	`
 
 	var destinations []dtos.DestinationResponse
