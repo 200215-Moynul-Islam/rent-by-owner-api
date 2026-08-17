@@ -9,6 +9,7 @@ import (
 type DestinationRepository interface {
 	Search(query string) ([]dtos.DestinationResponse, error)
 	Autocomplete(query string) ([]dtos.DestinationResponse, error)
+	Nearby(latitude, longitude, radiusKm float64) ([]dtos.NearbyDestinationResponse, error)
 }
 
 type destinationRepository struct {
@@ -96,6 +97,54 @@ func (r *destinationRepository) Autocomplete(
 		query, // exact country
 		query, // country prefix
 		query, // similarity ranking
+	).QueryRows(&destinations)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return destinations, nil
+}
+
+func (r *destinationRepository) Nearby(
+	latitude, longitude, radiusKm float64,
+) ([]dtos.NearbyDestinationResponse, error) {
+	const sql = `
+		SELECT
+			id,
+			city,
+			country,
+			COALESCE(population, 0) AS population,
+			ST_Y(location::geometry) AS latitude,
+			ST_X(location::geometry) AS longitude,
+			ST_Distance(
+				location,
+				ST_SetSRID(
+					ST_MakePoint(?, ?),
+					4326
+				)::geography
+			) / 1000 AS distance
+		FROM destinations
+		WHERE ST_DWithin(
+			location,
+			ST_SetSRID(
+				ST_MakePoint(?, ?),
+				4326
+			)::geography,
+			? * 1000
+		)
+		ORDER BY distance
+	`
+
+	var destinations []dtos.NearbyDestinationResponse
+
+	_, err := r.orm.Raw(
+		sql,
+		longitude,
+		latitude,
+		longitude,
+		latitude,
+		radiusKm,
 	).QueryRows(&destinations)
 
 	if err != nil {

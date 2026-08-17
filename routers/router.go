@@ -31,6 +31,11 @@ func init() {
 					&controllers.DestinationController{},
 					"get:Autocomplete",
 				),
+				beego.NSRouter(
+					"/nearby",
+					&controllers.DestinationController{},
+					"get:Nearby",
+				),
 			),
 		),
 	)
