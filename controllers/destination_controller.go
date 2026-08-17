@@ -40,3 +40,27 @@ func (controller *DestinationController) Search() {
 		destinations,
 	)
 }
+
+func (controller *DestinationController) Autocomplete() {
+	query := strings.TrimSpace(
+		controller.Ctx.Input.Query("q"),
+	)
+
+	if query == "" {
+		controller.sendBadRequest(
+			"Query parameter 'q' is required.",
+		)
+		return
+	}
+
+	destinations, err := controller.service.Autocomplete(query)
+	if err != nil {
+		controller.sendInternalServerError()
+		return
+	}
+
+	controller.sendSuccess(
+		"Destinations retrieved successfully.",
+		destinations,
+	)
+}

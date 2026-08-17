@@ -26,6 +26,11 @@ func init() {
 					&controllers.DestinationController{},
 					"get:Search",
 				),
+				beego.NSRouter(
+					"/autocomplete",
+					&controllers.DestinationController{},
+					"get:Autocomplete",
+				),
 			),
 		),
 	)

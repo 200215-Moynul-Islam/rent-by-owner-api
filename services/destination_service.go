@@ -7,6 +7,7 @@ import (
 
 type DestinationService interface {
 	Search(query string) ([]dtos.DestinationResponse, error)
+	Autocomplete(query string) ([]dtos.DestinationResponse, error)
 }
 
 type destinationService struct {
@@ -25,4 +26,10 @@ func (s *destinationService) Search(
 	query string,
 ) ([]dtos.DestinationResponse, error) {
 	return s.repository.Search(query)
+}
+
+func (s *destinationService) Autocomplete(
+	query string,
+) ([]dtos.DestinationResponse, error) {
+	return s.repository.Autocomplete(query)
 }
