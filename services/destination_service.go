@@ -33,13 +33,23 @@ func NewDestinationService(
 func (s *destinationService) Search(
 	query string,
 ) ([]dtos.DestinationResponse, error) {
-	return s.repository.Search(query)
+	destinations, err := s.repository.Search(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.ReRankDestinations(query, destinations), nil
 }
 
 func (s *destinationService) Autocomplete(
 	query string,
 ) ([]dtos.DestinationResponse, error) {
-	return s.repository.Autocomplete(query)
+	destinations, err := s.repository.Autocomplete(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.ReRankDestinations(query, destinations), nil
 }
 
 func (s *destinationService) Nearby(
