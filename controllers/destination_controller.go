@@ -115,3 +115,57 @@ func (controller *DestinationController) Nearby() {
 		destinations,
 	)
 }
+
+func (controller *DestinationController) WithinBounds() {
+	north, err := strconv.ParseFloat(
+		controller.Ctx.Input.Query("north"),
+		64,
+	)
+	if err != nil {
+		controller.sendBadRequest("Invalid north.")
+		return
+	}
+
+	south, err := strconv.ParseFloat(
+		controller.Ctx.Input.Query("south"),
+		64,
+	)
+	if err != nil {
+		controller.sendBadRequest("Invalid south.")
+		return
+	}
+
+	east, err := strconv.ParseFloat(
+		controller.Ctx.Input.Query("east"),
+		64,
+	)
+	if err != nil {
+		controller.sendBadRequest("Invalid east.")
+		return
+	}
+
+	west, err := strconv.ParseFloat(
+		controller.Ctx.Input.Query("west"),
+		64,
+	)
+	if err != nil {
+		controller.sendBadRequest("Invalid west.")
+		return
+	}
+
+	destinations, err := controller.service.WithinBounds(
+		north,
+		south,
+		east,
+		west,
+	)
+	if err != nil {
+		controller.sendBadRequest(err.Error())
+		return
+	}
+
+	controller.sendSuccess(
+		"Destinations within bounds retrieved successfully.",
+		destinations,
+	)
+}

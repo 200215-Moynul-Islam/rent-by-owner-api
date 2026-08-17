@@ -36,6 +36,11 @@ func init() {
 					&controllers.DestinationController{},
 					"get:Nearby",
 				),
+				beego.NSRouter(
+					"/within-bounds",
+					&controllers.DestinationController{},
+					"get:WithinBounds",
+				),
 			),
 		),
 	)

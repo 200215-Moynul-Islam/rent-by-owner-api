@@ -10,6 +10,12 @@ type DestinationService interface {
 	Search(query string) ([]dtos.DestinationResponse, error)
 	Autocomplete(query string) ([]dtos.DestinationResponse, error)
 	Nearby(latitude, longitude, radiusKm float64) ([]dtos.NearbyDestinationResponse, error)
+	WithinBounds(
+		north float64,
+		south float64,
+		east float64,
+		west float64,
+	) ([]dtos.DestinationResponse, error)
 }
 
 type destinationService struct {
@@ -53,5 +59,28 @@ func (s *destinationService) Nearby(
 		latitude,
 		longitude,
 		radiusKm,
+	)
+}
+
+func (s *destinationService) WithinBounds(
+	north float64,
+	south float64,
+	east float64,
+	west float64,
+) ([]dtos.DestinationResponse, error) {
+	if err := utils.ValidateBounds(
+		north,
+		south,
+		east,
+		west,
+	); err != nil {
+		return nil, err
+	}
+
+	return s.repository.WithinBounds(
+		north,
+		south,
+		east,
+		west,
 	)
 }

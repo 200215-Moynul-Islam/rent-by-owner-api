@@ -10,6 +10,12 @@ type DestinationRepository interface {
 	Search(query string) ([]dtos.DestinationResponse, error)
 	Autocomplete(query string) ([]dtos.DestinationResponse, error)
 	Nearby(latitude, longitude, radiusKm float64) ([]dtos.NearbyDestinationResponse, error)
+	WithinBounds(
+		north float64,
+		south float64,
+		east float64,
+		west float64,
+	) ([]dtos.DestinationResponse, error)
 }
 
 type destinationRepository struct {
@@ -145,6 +151,50 @@ func (r *destinationRepository) Nearby(
 		longitude,
 		latitude,
 		radiusKm,
+	).QueryRows(&destinations)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return destinations, nil
+}
+
+func (r *destinationRepository) WithinBounds(
+	north float64,
+	south float64,
+	east float64,
+	west float64,
+) ([]dtos.DestinationResponse, error) {
+	const sql = `
+		SELECT
+			id,
+			city,
+			country,
+			COALESCE(population, 0) AS population,
+			ST_Y(location::geometry) AS latitude,
+			ST_X(location::geometry) AS longitude
+		FROM destinations
+		WHERE ST_Within(
+			location::geometry,
+			ST_MakeEnvelope(
+				?,
+				?,
+				?,
+				?,
+				4326
+			)
+		)
+	`
+
+	var destinations []dtos.DestinationResponse
+
+	_, err := r.orm.Raw(
+		sql,
+		west,
+		south,
+		east,
+		north,
 	).QueryRows(&destinations)
 
 	if err != nil {
