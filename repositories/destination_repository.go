@@ -43,7 +43,7 @@ func (r *destinationRepository) Search(
 		WHERE
 			city ILIKE '%' || ? || '%'
 			OR country ILIKE '%' || ? || '%'
-			OR similarity(city, ?) > 0.5
+			OR city % ?
 	`
 
 	var destinations []dtos.DestinationResponse
