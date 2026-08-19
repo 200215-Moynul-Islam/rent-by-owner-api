@@ -1,6 +1,11 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
+
+const maxBoundsSizeKm = 50
 
 func ValidateNearbySearchParameters(
 	latitude float64,
@@ -17,6 +22,10 @@ func ValidateNearbySearchParameters(
 
 	if radiusKm <= 0 {
 		return fmt.Errorf("radius must be greater than 0")
+	}
+
+	if radiusKm > 25 {
+		return fmt.Errorf("radius must be less than or equal to 25")
 	}
 
 	return nil
@@ -52,5 +61,59 @@ func ValidateBounds(
 		return fmt.Errorf("west cannot be greater than east")
 	}
 
+	widthKm := calculateDistanceKm(
+		north,
+		west,
+		north,
+		east,
+	)
+
+	heightKm := calculateDistanceKm(
+		south,
+		west,
+		north,
+		west,
+	)
+
+	if widthKm > maxBoundsSizeKm {
+		return fmt.Errorf(
+			"bounds width cannot exceed %d km",
+			maxBoundsSizeKm,
+		)
+	}
+
+	if heightKm > maxBoundsSizeKm {
+		return fmt.Errorf(
+			"bounds height cannot exceed %d km",
+			maxBoundsSizeKm,
+		)
+	}
+
 	return nil
+}
+
+func calculateDistanceKm(
+	lat1 float64,
+	lon1 float64,
+	lat2 float64,
+	lon2 float64,
+) float64 {
+	const earthRadiusKm = 6371.0
+
+	latDifference := (lat2 - lat1) * math.Pi / 180
+	lonDifference := (lon2 - lon1) * math.Pi / 180
+
+	lat1Rad := lat1 * math.Pi / 180
+	lat2Rad := lat2 * math.Pi / 180
+
+	a :=
+		math.Sin(latDifference/2)*math.Sin(latDifference/2) +
+			math.Cos(lat1Rad)*
+				math.Cos(lat2Rad)*
+				math.Sin(lonDifference/2)*
+				math.Sin(lonDifference/2)
+
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return earthRadiusKm * c
 }
